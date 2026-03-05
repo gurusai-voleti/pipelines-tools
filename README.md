@@ -19,11 +19,11 @@ Google Cloud project.
 4. Make a bucket on GCS to store the output from the pipeline:
 
         export BUCKET=gs://${GOOGLE_CLOUD_PROJECT}-pipelines
-        gsutil mb ${BUCKET}
+        gcloud storage buckets create ${BUCKET}
 
 5. Put some test data into the bucket:
 
-        echo "Hello World" | gsutil cp - ${BUCKET}/input
+        echo "Hello World" | gcloud storage cp - ${BUCKET}/input
 
 6. Make a pipeline script that computes the SHA1 sum of a file:
 
@@ -35,7 +35,7 @@ Google Cloud project.
 
 8. Check the generated output file:
 
-        gsutil cat ${BUCKET}/output
+        gcloud storage cat ${BUCKET}/output
 
 That's it: you've run your first pipeline.  For more information about the
 input formats supported by the pipelines tool, check out the [source code][3].
@@ -57,10 +57,10 @@ EOF
 $ pipelines --project=my-project run hello.script --output=gs://my-bucket/logs
 ```
 
-After the pipeline finishes, you can inspect the output using `gsutil`:
+After the pipeline finishes, you can inspect the output using `gcloud storage`:
 
 ```
-$ gsutil cat gs://my-bucket/logs/output
+$ gcloud storage cat gs://my-bucket/logs/output
 ```
 
 The script file format is described in the [source code for the command][3].
@@ -68,7 +68,7 @@ The script file format is described in the [source code for the command][3].
 ### Using gcsfuse with the pipelines tool
 
 Use `--fuse` flag to allow the `pipelines` tool to use [gcsfuse][gcs-fuse] to localize input files
-instead of copying them one by one with `gsutil`.
+instead of copying them one by one with `gcloud storage`.
 
 **Note**: Files other than those directly mentioned by the `--inputs` flag will be
 available to container, since the entire bucket is mounted.

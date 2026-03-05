@@ -332,7 +332,7 @@ func buildRequest(filename, project string) (*genomics.RunPipelineRequest, error
 
 	var actions []*genomics.Action
 	if *outputInterval != 0 && *output != "" {
-		action := bash(fmt.Sprintf("while true; do sleep %.0f; gsutil -q cp /google/logs/output %s; done", (*outputInterval).Seconds(), *output))
+		action := bash(fmt.Sprintf("while true; do sleep %.0f; gcloud storage cp /google/logs/output %s; done", (*outputInterval).Seconds(), *output))
 		action.RunInBackground = true
 		actions = append(actions, action)
 	}
@@ -691,7 +691,7 @@ func parsePorts(input string) (map[string]int64, error) {
 }
 
 func gsutil(arguments ...string) *genomics.Action {
-	return bash("gsutil -q " + strings.Join(arguments, " "))
+	return bash("gcloud storage " + strings.Join(arguments, " "))
 }
 
 func upload(input, output string) (*genomics.Action, error) {
@@ -770,10 +770,10 @@ func gcsTransfer(remote string) func(from, to string) *genomics.Action {
 		from = strings.TrimRight(from, "*")
 		to = strings.TrimRight(to, "*")
 		if strings.HasSuffix(remote, "/**") {
-			return gsutil("-m", "cp", "-r", gcsJoin(from, "*"), to)
+			return gsutil("cp", "--recursive", gcsJoin(from, "*"), to)
 		}
 		if strings.HasSuffix(remote, "/*") {
-			return gsutil("-m", "cp", gcsJoin(from, "*"), to)
+			return gsutil("cp", gcsJoin(from, "*"), to)
 		}
 		return gsutil("cp", from, to)
 	}
